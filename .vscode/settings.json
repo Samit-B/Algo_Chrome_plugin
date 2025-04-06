@@ -1,0 +1,8 @@
+{
+	// ...existing code...
+	"files.exclude": {
+		"node_modules": true,
+		"dist": true
+	}
+	// ...existing code...
+}
