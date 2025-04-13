@@ -218,6 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function simulateBotResponse(userMessage) {
     showTypingIndicator();
+    messageInput.value = '';
 
     try {
       let response = await fetch(`http://localhost:8000/chat/query?userChatQuery=${encodeURIComponent(userMessage)}`, {
@@ -365,7 +366,6 @@ function startListening() {
 
   recognition.start();
   isAssistantListening = true;
-  setAnimationState(talkAssistantButton, 'listening');
   talkAssistantButton.textContent = 'Listening...';
 
   silenceTimeout = setTimeout(() => {
@@ -378,7 +378,6 @@ function stopListening() {
   recognition.stop();
   clearTimeout(silenceTimeout);
   isAssistantListening = false;
-  setAnimationState(talkAssistantButton, null);
   talkAssistantButton.textContent = 'Talk Assistant';
 }
 
@@ -398,7 +397,6 @@ recognition.onresult = async (event) => {
   console.log("User Query:", userQuery);
 
   addMessage(userQuery, true);
-  setAnimationState(talkAssistantButton, 'processing');
   talkAssistantButton.textContent = 'Processing...';
 
   try {
@@ -412,12 +410,10 @@ recognition.onresult = async (event) => {
     utterance.lang = 'en-US';
 
     utterance.onstart = () => {
-      setAnimationState(talkAssistantButton, 'replaying');
       talkAssistantButton.textContent = 'Replaying...';
     };
 
     utterance.onend = () => {
-      setAnimationState(talkAssistantButton, null);
       talkAssistantButton.textContent = 'Listening...';
       startListening(); // auto restart listening after bot reply
     };
@@ -445,30 +441,6 @@ recognition.onend = () => {
 };
 
 
-
-
-
-  function setAnimationState(button, state) {
-    button.classList.remove('listening', 'processing', 'replaying');
-    // Hide all videos
-    const videos = document.querySelectorAll('.voice-assistant-container video');
-    videos.forEach(video => {
-        video.pause(); // Stop the video
-        video.classList.remove('active'); // Hide the video
-    });
-
-    if (state) {
-        button.classList.add(state); // Add the new state class to the button
-
-        // Show and play the corresponding video
-        const video = document.getElementById(`${state}Video`);
-        if (video) {
-            video.classList.add('active'); // Show the video
-            video.play(); // Play the video
-        }
-    }
-}
-
 const stopAssistantButton = document.getElementById('stop-assistant-btn');
 
 stopAssistantButton.addEventListener('click', () => {
@@ -480,7 +452,6 @@ stopAssistantButton.addEventListener('click', () => {
   }
 
   // Reset button state
-  setAnimationState(talkAssistantButton, null);
   talkAssistantButton.textContent = 'Talk Assistant';
 });
 
